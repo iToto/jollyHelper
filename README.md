@@ -19,5 +19,5 @@ Set your Port:
 You can run the application with:
 
 ```sh
-go run main.go
+» go run main.go
 ```
