@@ -1,20 +1,20 @@
 package main
 
-import (
-	"fmt"
-	"net/http"
-	"os"
-)
+import "github.com/gin-gonic/gin"
 
 func main() {
-	http.HandleFunc("/", hello)
-	fmt.Println("listening...")
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func hello(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "hello, world")
+	router := gin.Default()
+	router.GET("/", func(c *gin.Context) {
+		c.String(200, "hello world")
+	})
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(200, "pong")
+	})
+	router.POST("/submit", func(c *gin.Context) {
+		c.String(401, "not authorized")
+	})
+	router.PUT("/error", func(c *gin.Context) {
+		c.String(500, "and error hapenned :(")
+	})
+	router.Run(":8080")
 }
