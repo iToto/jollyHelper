@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+var (
+	port = os.Getenv("PORT")
+)
+
 func main() {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
@@ -19,5 +23,5 @@ func main() {
 	router.PUT("/error", func(c *gin.Context) {
 		c.String(500, "and error hapenned :(")
 	})
-	router.Run(":" + os.Getenv("PORT"))
+	router.Run(":" + port)
 }
