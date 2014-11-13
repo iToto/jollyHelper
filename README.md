@@ -8,16 +8,20 @@ Then it will randomly assign each email address a name (that does not belong to 
 
 ## Setup
 
-Set your Port:
+* Copy and remane the sample environment file
 
 ```sh
-» export PORT={PORT_NUMBER}
+» cp env.example .env
 ```
+
+* Configure the .env file to your needs
+
+* Install [Heroku toolbelt](https://toolbelt.heroku.com)
 
 ## Run
 
 You can run the application with:
 
 ```sh
-» go run main.go
+» foreman start -e .env
 ```
