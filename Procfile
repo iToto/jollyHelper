@@ -1,1 +1,1 @@
-web: jollyHelper
+web: $WEB
