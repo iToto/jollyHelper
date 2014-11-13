@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"os"
+)
 
 func main() {
 	router := gin.Default()
@@ -16,5 +19,5 @@ func main() {
 	router.PUT("/error", func(c *gin.Context) {
 		c.String(500, "and error hapenned :(")
 	})
-	router.Run(":5000")
+	router.Run(":" + os.Getenv("PORT"))
 }
