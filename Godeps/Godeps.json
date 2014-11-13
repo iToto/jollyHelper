@@ -10,6 +10,10 @@
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
+		},
+		{
+			"ImportPath": "github.com/op/go-logging",
+			"Rev": "25891250fe98858f83506bc4411f82722d1be344"
 		}
 	]
 }
