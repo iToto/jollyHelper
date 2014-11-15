@@ -12,8 +12,8 @@ import (
 var (
 	APP_PORT    = os.Getenv("PORT")
 	APP_ENV     = os.Getenv("ENV")
-	APP_DB_URL  = os.Getenv("MONGOHQ_URL")
-	APP_DB_NAME = os.Getenv("MONGOHQ_NAME")
+	APP_DB_URL  = os.Getenv("MONGOLAB_URI")
+	APP_DB_NAME = os.Getenv("MONGOLAB_NAME")
 )
 
 func init() {
@@ -21,11 +21,11 @@ func init() {
 
 	log.Printf("APP_ENV - %s = %s", "ENV", APP_ENV)
 	log.Printf("APP_PORT  - %s = %s", "PORT", APP_PORT)
-	log.Printf("APP_DB_URL  - %s = %s", "MONGOHQ_URL", APP_DB_URL)
-	log.Printf("APP_DB_NAME  - %s = %s", "MONGOHQ_NAME", APP_DB_NAME)
+	log.Printf("APP_DB_URL  - %s = %s", "MONGOLAB_URI", APP_DB_URL)
+	log.Printf("APP_DB_NAME  - %s = %s", "MONGOLAB_NAME", APP_DB_NAME)
 
 	if APP_ENV == "" || APP_PORT == "" || APP_DB_URL == "" || APP_DB_NAME == "" {
-		log.Printf("Missing environment variables: ENV: %s, PORT: %s, MONGOHQ_URL: %s, MONGOHQ_NAME  \n", APP_ENV, APP_PORT, APP_DB_URL, APP_DB_NAME)
+		log.Printf("Missing environment variables: ENV: %s, PORT: %s, MONGOLAB_URI: %s, MONGOLAB_NAME  \n", APP_ENV, APP_PORT, APP_DB_URL, APP_DB_NAME)
 	}
 }
 
