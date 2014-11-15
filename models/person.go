@@ -2,7 +2,7 @@ package models
 
 import (
 	"gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
+	// "gopkg.in/mgo.v2/bson"
 	// "code.google.com/p/go.crypto/bcrypt"
 	// "code.google.com/p/go.crypto/pbkdf2"
 	// "crypto/rand"
