@@ -39,7 +39,7 @@ func main() {
 	person := router.Group("/persons/")
 	person.POST("/", personResource.Create)
 	person.GET("/:id", personResource.Get)
-	// person.GET("/", personResource.Get)
+	person.GET("/", personResource.List)
 	// person.PUT("/:uid", personResource.Update)
 	// person.DELETE("/:uid/:disable", personResource.Disable)
 
