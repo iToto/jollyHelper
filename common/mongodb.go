@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2"
+	"log"
 	//"gopkg.in/mgo.v2/bson"
 )
 
@@ -12,6 +13,7 @@ func MongoDbHandler(url string, database string) gin.HandlerFunc {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("Successfully connected to Mongo %s:%s", url, database)
 	return func(c *gin.Context) {
 		c.Set("mongoSession", session)
 
