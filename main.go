@@ -2,17 +2,15 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/op/go-logging"
+	"github.com/iToto/jollyHelper/resources"
 	"log"
 	"os"
 	"runtime"
 )
 
 var (
-	APP_PORT   = os.Getenv("PORT")
-	APP_ENV    = os.Getenv("ENV")
-	LOG_FORMAT = os.Getenv("LOG_FORMAT")
-	LOGGER     *logging.Logger
+	APP_PORT = os.Getenv("PORT")
+	APP_ENV  = os.Getenv("ENV")
 )
 
 func init() {
@@ -28,13 +26,16 @@ func init() {
 }
 
 func main() {
-
-	LOGGER = logging.MustGetLogger("jollyHelper")
-	logBackend := logging.NewLogBackend(os.Stdout, "", 0)
-	logging.SetFormatter(logging.MustStringFormatter(LOG_FORMAT))
-	logging.SetBackend(logBackend)
-
 	router := gin.Default()
+
+	personResource := &resources.PersonResource{}
+	person := router.Group("/persons/")
+	person.POST("/", personResource.Create)
+	// person.GET("/:uid", personResource.Get)
+	// person.GET("/", personResource.Get)
+	// person.PUT("/:uid", personResource.Update)
+	// person.DELETE("/:uid/:disable", personResource.Disable)
+
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "hello world")
 	})
