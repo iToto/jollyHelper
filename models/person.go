@@ -13,7 +13,8 @@ import (
 
 // PERSONS_COL The collection name
 const (
-	PERSONS_COL = "persons"
+	PERSONS_COL       = "persons"
+	MAX_GET_DOCUMENTS = 100 // The maximum number of documents to fetch
 )
 
 // JSON, ditch TitleCase for snake_case.
@@ -39,4 +40,8 @@ func (p *Person) Index() mgo.Index {
 // Collection getter method for the collections constant
 func (p *Person) Collection() string {
 	return PERSONS_COL
+}
+
+func (p *Person) Limit() int {
+	return MAX_GET_DOCUMENTS
 }
