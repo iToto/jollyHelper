@@ -93,5 +93,35 @@ func (p *PersonResource) Get(c *gin.Context) {
 	}
 	sendResponse(&person, messagecode.S_RESOURCE_OK, c)
 	return
+}
 
+func (p *PersonResource) List(c *gin.Context) {
+	var err error
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+
+	person := &models.Person{}
+	persons := []models.Person{}
+	personCollection := mongoStore.C(person.Collection())
+
+	err = personCollection.EnsureIndex(person.Index())
+
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = personCollection.Find(bson.M{}).Limit(person.Limit()).All(&persons)
+
+	log.Printf("persons: %q", person)
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			sendError(&err, messagecode.S_RESOURCE_NOTFOUND, c)
+		} else {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+		}
+		return
+	}
+	sendResponse(&persons, messagecode.S_RESOURCE_OK, c)
+	return
 }
