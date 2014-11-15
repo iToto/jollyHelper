@@ -2,17 +2,18 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/op/go-logging"
+	"github.com/iToto/jollyHelper/common"
+	"github.com/iToto/jollyHelper/resources"
 	"log"
 	"os"
 	"runtime"
 )
 
 var (
-	APP_PORT   = os.Getenv("PORT")
-	APP_ENV    = os.Getenv("ENV")
-	LOG_FORMAT = os.Getenv("LOG_FORMAT")
-	LOGGER     *logging.Logger
+	APP_PORT    = os.Getenv("PORT")
+	APP_ENV     = os.Getenv("ENV")
+	APP_DB_URL  = os.Getenv("DB_URL")
+	APP_DB_NAME = os.Getenv("DB_NAME")
 )
 
 func init() {
@@ -20,21 +21,28 @@ func init() {
 
 	log.Printf("APP_ENV - %s = %s", "ENV", APP_ENV)
 	log.Printf("APP_PORT  - %s = %s", "PORT", APP_PORT)
+	log.Printf("APP_DB_URL  - %s = %s", "DB_URL", APP_DB_URL)
+	log.Printf("APP_DB_NAME  - %s = %s", "DB", APP_DB_NAME)
 
-	if APP_ENV == "" || APP_PORT == "" {
-		log.Printf("Please define application environment and port with global variables ENV: %s (local,testing,staging,production) and PORT: %s respectively \n", APP_ENV, APP_PORT)
-		APP_ENV = "production" // Default to production if not set...
+	if APP_ENV == "" || APP_PORT == "" || APP_DB_URL == "" || APP_DB_NAME == "" {
+		log.Printf("Missing environment variables: ENV: %s, PORT: %s, DB_URL: %s, DB_NAME  \n", APP_ENV, APP_PORT, APP_DB_URL, APP_DB_NAME)
 	}
 }
 
 func main() {
-
-	LOGGER = logging.MustGetLogger("jollyHelper")
-	logBackend := logging.NewLogBackend(os.Stdout, "", 0)
-	logging.SetFormatter(logging.MustStringFormatter(LOG_FORMAT))
-	logging.SetBackend(logBackend)
-
 	router := gin.Default()
+
+	// Connect to DB
+	router.Use(common.MongoDbHandler(APP_DB_URL, APP_DB_NAME))
+
+	personResource := &resources.PersonResource{}
+	person := router.Group("/persons/")
+	person.POST("/", personResource.Create)
+	// person.GET("/:uid", personResource.Get)
+	// person.GET("/", personResource.Get)
+	// person.PUT("/:uid", personResource.Update)
+	// person.DELETE("/:uid/:disable", personResource.Disable)
+
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "hello world")
 	})
