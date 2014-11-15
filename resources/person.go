@@ -10,10 +10,10 @@ import (
 	"github.com/iToto/jollyHelper/models"
 	"log"
 	// "github.com/op/go-logging"
-	// "gopkg.in/mgo.v2"
-	// "gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	// "strconv"
-	// "time"
+	"time"
 )
 
 type PersonResource struct {
@@ -23,8 +23,6 @@ func (p *PersonResource) Create(c *gin.Context) {
 	person := &models.Person{}
 
 	err := binding.JSON.Bind(c.Request, person)
-	log.Print("Request: %s", c.Request)
-	log.Print("Person: %s", person)
 
 	if err != nil {
 		sendError(&err, messagecode.E_INVALID_REQUEST, c)
@@ -35,24 +33,24 @@ func (p *PersonResource) Create(c *gin.Context) {
 		person.Uid = models.NewUid()
 	}
 
-	// mongoStore := c.MustGet("mongoStore").(*mgo.Database)
-	// personsCollection := mongoStore.C(person.Collection())
-	// err = personsCollection.EnsureIndex(person.Index())
-	// if err != nil {
-	// 	sendError(&err, messagecode.E_SERVER_ERROR, c)
-	// 	return
-	// }
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	personsCollection := mongoStore.C(person.Collection())
+	err = personsCollection.EnsureIndex(person.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
 
-	// query := bson.M{"email": person.Email}
-	// person.CreatedAt = time.Now().Unix()
-	// update := bson.M{"$setOnInsert": model.Struct2Map(person)}
+	query := bson.M{"email": person.Email}
+	person.CreatedAt = time.Now().Unix()
+	update := bson.M{"$setOnInsert": models.Struct2Map(person)}
 
-	// info, err := personsCollection.Upsert(query, update)
-	// if err != nil {
-	// 	LOGGER.Error("%s", info)
-	// 	sendError(&err, messagecode.E_SERVER_ERROR, c)
-	// 	return
-	// }
+	info, err := personsCollection.Upsert(query, update)
+	if err != nil {
+		log.Print("ERROR: %s", info)
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
 
 	sendResponse(&person, messagecode.S_RESOURCE_CREATED, c)
 	return
