@@ -12,8 +12,16 @@
 			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
 		},
 		{
-			"ImportPath": "github.com/op/go-logging",
-			"Rev": "25891250fe98858f83506bc4411f82722d1be344"
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
+		},
+		{
+			"ImportPath": "laerte.sociablelabs.com/common",
+			"Rev": "398c3d6662d7424234c3bd5c021f07b6ab52c3f0"
 		}
 	]
 }
