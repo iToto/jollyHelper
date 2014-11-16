@@ -23,7 +23,7 @@ type Person struct {
 	CreatedAt int64  `bson:"created_at,omitempty" json:"created_at" binding:"-"`
 	Name      string `bson:"name,omitempty" json:"name,omitempty" binding:"required"`
 	Email     string `bson:"email,omitempty" json:"email" binding:"required"`
-	Age       int8   `bson:"age,omitempty" json:"age" binding:"required"`
+	Age       string `bson:"age,omitempty" json:"age" binding:"required"`
 }
 
 // Index sets indexes on appropriate columns/properties
