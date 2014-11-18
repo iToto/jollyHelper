@@ -5,7 +5,6 @@ import (
 )
 
 type SecretSanta struct {
-	Uid        string `bson:"uid,omitempty" json:"uid" binding:"-"`
 	Name       string `bson:"name,omitempty" json:"name,omitempty" binding:"required"`
 	Owner      string `bson:"owner,omitempty" json:"owner" binding:"-"`
 	AssignedOn int64  `bson:"assigned_on,omitempty" json:"assigned_on" binding:"-"`
@@ -18,7 +17,7 @@ const (
 // Index sets indexes on appropriate columns/properties
 func (ss *SecretSanta) Index() mgo.Index {
 	return mgo.Index{
-		Key:    []string{"uid"},
+		Key:    []string{"name"},
 		Unique: true,
 		//DropDups:   true,
 		Background: true,
