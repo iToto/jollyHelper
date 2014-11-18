@@ -5,10 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"laerte.sociablelabs.com/common"
 	"laerte.sociablelabs.com/common/messagecode"
+	"log"
 )
 
 // sendError a common function for logging & sending errors
 func sendError(err *error, code string, c *gin.Context) {
+	log.Printf("error encountered: %s", *err)
 	r := messagecode.DefMessage.Get(code)
 	c.JSON(r["HTTP_CODE"].(int), &common.HttpResp{"status": r["MSG"].(string)})
 	return
