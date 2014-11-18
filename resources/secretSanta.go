@@ -1,7 +1,7 @@
 package resources
 
 import (
-	// "errors"
+	"errors"
 	"github.com/gin-gonic/gin"
 	// "github.com/iToto/jollyHelper/common"
 	"github.com/iToto/jollyHelper/common/messagecode"
@@ -56,11 +56,21 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 
 	// Assign a name to each person
 	err = runSecretSanta(persons, exchangeList)
+
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+	}
+
 	log.Printf("Secret Santa List Done: %s", exchangeList)
 }
 
 func runSecretSanta(persons []models.Person, secretSantaList []*SecretSantaResource) error {
 	// For every person, assign them a secret santa
+
+	if len(persons) == 0 || len(secretSantaList) == 0 {
+		return errors.New("Arrays cannot be empty")
+	}
+
 	rand.Seed(time.Now().UTC().UnixNano())
 	for index, person := range persons {
 		// Loop until unused name is chosen that is not current person
