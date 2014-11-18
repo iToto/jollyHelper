@@ -15,9 +15,6 @@ import (
 )
 
 type SecretSantaResource struct {
-	Name       string
-	Owner      string
-	assignedOn int64
 }
 
 func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
@@ -42,13 +39,13 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	// log.Printf("List of people: %s", persons)
 
 	// Create names array list with
-	exchangeList := make([]*SecretSantaResource, 0)
+	exchangeList := make([]models.SecretSanta, 0)
 	for _, person := range persons {
 		// Create new secret santa name for each person
-		secretSantaName := &SecretSantaResource{}
+		secretSantaName := models.SecretSanta{}
 		secretSantaName.Name = person.Name
 		secretSantaName.Owner = ""
-		secretSantaName.assignedOn = 0
+		secretSantaName.AssignedOn = 0
 		exchangeList = append(exchangeList, secretSantaName)
 	}
 
@@ -64,7 +61,7 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	log.Printf("Secret Santa List Done: %s", exchangeList)
 }
 
-func runSecretSanta(persons []models.Person, secretSantaList []*SecretSantaResource) error {
+func runSecretSanta(persons []models.Person, secretSantaList []models.SecretSanta) error {
 	// For every person, assign them a secret santa
 
 	if len(persons) == 0 || len(secretSantaList) == 0 {
@@ -75,12 +72,12 @@ func runSecretSanta(persons []models.Person, secretSantaList []*SecretSantaResou
 	for index, person := range persons {
 		// Loop until unused name is chosen that is not current person
 		var i int
-		for i = randInt(0, len(persons)); (i == index) || (secretSantaList[i].assignedOn != 0); i = randInt(0, len(persons)) {
-			log.Printf("Re-choosing i: %i - assignedOn: %i", i, secretSantaList[i].assignedOn)
+		for i = randInt(0, len(persons)); (i == index) || (secretSantaList[i].AssignedOn != 0); i = randInt(0, len(persons)) {
+			log.Printf("Re-choosing i: %i - AssignedOn: %i", i, secretSantaList[i].AssignedOn)
 		}
 		// Selected secret santa, update secretSanta list with secret santa
 		log.Printf("Name selected for %s", person.Name)
-		secretSantaList[i].assignedOn = time.Now().Unix()
+		secretSantaList[i].AssignedOn = time.Now().Unix()
 		secretSantaList[i].Owner = person.Name
 	}
 	return nil
