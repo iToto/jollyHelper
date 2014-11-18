@@ -1,13 +1,19 @@
 package models
 
 import (
+	// "github.com/iToto/jollyHelper/resources"
 	"gopkg.in/mgo.v2"
 )
 
+type NameEntry struct {
+	Name       string
+	Owner      string
+	AssignedOn int64
+}
+
 type SecretSanta struct {
-	Name       string `bson:"name,omitempty" json:"name,omitempty" binding:"required"`
-	Owner      string `bson:"owner,omitempty" json:"owner" binding:"-"`
-	AssignedOn int64  `bson:"assigned_on,omitempty" json:"assigned_on" binding:"-"`
+	CreatedAt int64       `bson:"created_at,omitempty" json:"created_at" binding:"-"`
+	List      []NameEntry `bson:"list,omitempty" json:"list,omitempty" binding:"required"`
 }
 
 const (
@@ -17,7 +23,7 @@ const (
 // Index sets indexes on appropriate columns/properties
 func (ss *SecretSanta) Index() mgo.Index {
 	return mgo.Index{
-		Key:    []string{"name"},
+		Key:    []string{"list"},
 		Unique: true,
 		//DropDups:   true,
 		Background: true,

@@ -41,10 +41,10 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	// log.Printf("List of people: %s", persons)
 
 	// Create names array list with
-	exchangeList := make([]models.SecretSanta, 0)
+	exchangeList := make([]models.NameEntry, 0)
 	for _, person := range persons {
 		// Create new secret santa name for each person
-		secretSantaName := models.SecretSanta{}
+		secretSantaName := models.NameEntry{}
 		secretSantaName.Name = person.Name
 		secretSantaName.Owner = ""
 		secretSantaName.AssignedOn = 0
@@ -66,16 +66,9 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	secretSantaModel := &models.SecretSanta{}
 	secretSantaCollection := mongoStore.C(secretSantaModel.Collection())
 
-	// jsonList, err := json.Marshal(exchangeList)
-	// log.Printf("JsonList: %s", jsonList)
-
-	// if err != nil {
-	// 	sendError(&err, messagecode.E_SERVER_ERROR, c)
-	// 	return
-	// }
-	// err = secretSantaCollection.Insert(jsonList, secretSantaModel)
-	//
-	err = secretSantaCollection.Insert(spliceToInterface(exchangeList)...)
+	secretSantaModel.CreatedAt = time.Now().Unix()
+	secretSantaModel.List = exchangeList
+	err = secretSantaCollection.Insert(secretSantaModel)
 	if err != nil {
 		sendError(&err, messagecode.E_SERVER_ERROR, c)
 		return
@@ -89,7 +82,7 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 
 }
 
-func runSecretSanta(persons []models.Person, secretSantaList []models.SecretSanta) error {
+func runSecretSanta(persons []models.Person, secretSantaList []models.NameEntry) error {
 	// For every person, assign them a secret santa
 
 	if len(persons) == 0 || len(secretSantaList) == 0 {
