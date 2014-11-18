@@ -10,7 +10,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	// "strconv"
+	// "encoding/json"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -59,6 +61,32 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	}
 
 	log.Printf("Secret Santa List Done: %s", exchangeList)
+
+	// Store Secret Santa List to DB
+	secretSantaModel := &models.SecretSanta{}
+	secretSantaCollection := mongoStore.C(secretSantaModel.Collection())
+
+	// jsonList, err := json.Marshal(exchangeList)
+	// log.Printf("JsonList: %s", jsonList)
+
+	// if err != nil {
+	// 	sendError(&err, messagecode.E_SERVER_ERROR, c)
+	// 	return
+	// }
+	// err = secretSantaCollection.Insert(jsonList, secretSantaModel)
+	//
+	err = secretSantaCollection.Insert(spliceToInterface(exchangeList)...)
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = secretSantaCollection.EnsureIndex(secretSantaModel.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
 }
 
 func runSecretSanta(persons []models.Person, secretSantaList []models.SecretSanta) error {
@@ -85,4 +113,22 @@ func runSecretSanta(persons []models.Person, secretSantaList []models.SecretSant
 
 func randInt(min int, max int) int {
 	return min + rand.Intn(max-min)
+}
+
+func spliceToInterface(array interface{}) []interface{} {
+
+	v := reflect.ValueOf(array)
+	t := v.Type()
+
+	if t.Kind() != reflect.Slice {
+		log.Panicf("`array` should be %s but got %s", reflect.Slice, t.Kind())
+	}
+
+	result := make([]interface{}, v.Len(), v.Len())
+
+	for i := 0; i < v.Len(); i++ {
+		result[i] = v.Index(i).Interface()
+	}
+
+	return result
 }
