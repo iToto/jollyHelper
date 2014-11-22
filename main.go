@@ -56,6 +56,10 @@ func main() {
 	secretSanta := router.Group("/secretsanta")
 	secretSanta.POST("/", secretSantaResource.AssignNames)
 
+	notificationResource := resources.NotificationResource{}
+	notification := router.Group("/notification")
+	notification.GET("/:id", notificationResource.Send)
+
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "hello world")
 	})
