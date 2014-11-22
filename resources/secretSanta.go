@@ -30,6 +30,8 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	persons := []models.Person{}
 	personCollection := mongoStore.C(personModel.Collection())
 
+	var emptyPerson models.Person
+
 	err = personCollection.EnsureIndex(personModel.Index())
 
 	if err != nil {
@@ -46,7 +48,7 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 		// Create new secret santa name for each person
 		secretSantaName := models.NameEntry{}
 		secretSantaName.Name = person.Name
-		secretSantaName.Owner = ""
+		secretSantaName.Owner = emptyPerson
 		secretSantaName.AssignedOn = 0
 		exchangeList = append(exchangeList, secretSantaName)
 	}
@@ -99,7 +101,7 @@ func runSecretSanta(persons []models.Person, secretSantaList []models.NameEntry)
 		// Selected secret santa, update secretSanta list with secret santa
 		log.Printf("Name selected for %s", person.Name)
 		secretSantaList[i].AssignedOn = time.Now().Unix()
-		secretSantaList[i].Owner = person.Name
+		secretSantaList[i].Owner = person
 	}
 	return nil
 }

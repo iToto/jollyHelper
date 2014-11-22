@@ -1,13 +1,13 @@
 package models
 
 import (
-	// "github.com/iToto/jollyHelper/resources"
+	// "github.com/iToto/jollyHelper/models"
 	"gopkg.in/mgo.v2"
 )
 
 type NameEntry struct {
 	Name       string
-	Owner      string
+	Owner      Person
 	AssignedOn int64
 }
 
