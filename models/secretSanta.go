@@ -12,6 +12,7 @@ type NameEntry struct {
 }
 
 type SecretSanta struct {
+	Uid       string      `bson:"uid,omitempty" json:"uid" binding:"-"`
 	CreatedAt int64       `bson:"created_at,omitempty" json:"created_at" binding:"-"`
 	List      []NameEntry `bson:"list,omitempty" json:"list,omitempty" binding:"required"`
 }
@@ -23,7 +24,7 @@ const (
 // Index sets indexes on appropriate columns/properties
 func (ss *SecretSanta) Index() mgo.Index {
 	return mgo.Index{
-		Key:    []string{"list"},
+		Key:    []string{"uid", "list"},
 		Unique: true,
 		//DropDups:   true,
 		Background: true,
