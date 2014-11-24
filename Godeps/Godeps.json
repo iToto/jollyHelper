@@ -8,8 +8,16 @@
 			"Rev": "3b079bb6f79ae501e73a5401c41b589f6616b61e"
 		},
 		{
+			"ImportPath": "github.com/jmcvetta/napping",
+			"Rev": "3d1a38f127cc02c6b297968d00929ae26aacec03"
+		},
+		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
+		},
+		{
+			"ImportPath": "github.com/mostafah/mandrill",
+			"Rev": "891bc3d16358ff5695152f97b0f5e0261bda016e"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
