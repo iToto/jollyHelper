@@ -68,8 +68,10 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	secretSantaModel := &models.SecretSanta{}
 	secretSantaCollection := mongoStore.C(secretSantaModel.Collection())
 
+	secretSantaModel.Uid = models.NewUid()
 	secretSantaModel.CreatedAt = time.Now().Unix()
 	secretSantaModel.List = exchangeList
+
 	err = secretSantaCollection.Insert(secretSantaModel)
 	if err != nil {
 		sendError(&err, messagecode.E_SERVER_ERROR, c)
@@ -81,6 +83,9 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 		sendError(&err, messagecode.E_SERVER_ERROR, c)
 		return
 	}
+
+	sendResponse(&secretSantaModel, messagecode.S_RESOURCE_OK, c)
+	return
 
 }
 
