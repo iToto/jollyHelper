@@ -13,7 +13,7 @@ import (
 	// "strconv"
 	// "encoding/json"
 	// "reflect"
-	// "time"
+	"time"
 )
 
 type NotificationResource struct {
@@ -27,6 +27,14 @@ func (n *NotificationResource) Send(c *gin.Context) {
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
 
 	log.Printf("Sending out secret Santa!")
+	notification := &models.Notification{}
+	notificationsCollection := mongoStore.C(notification.Collection())
+
+	err = notificationsCollection.EnsureIndex(notification.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
 
 	// Get all names from db sorted by Age, Decreasing
 	secretSantaModel := &models.SecretSanta{}
@@ -45,7 +53,7 @@ func (n *NotificationResource) Send(c *gin.Context) {
 
 	// Create names array list with
 	for _, secretSanta := range secretSantaList.List {
-		// TODO: Send out secret santa for each person
+		// Send out secret santa for each person
 
 		log.Printf("Sending email to: %s with name: %s", secretSanta.Owner.Email, secretSanta.Name)
 		err = sendEmail(secretSanta.Owner.Email, secretSanta.Owner.Name, secretSanta.Name)
@@ -54,6 +62,18 @@ func (n *NotificationResource) Send(c *gin.Context) {
 			sendError(&err, messagecode.E_SERVER_ERROR, c)
 			return
 		}
+
+		// Save notification to DB
+		notification.Uid = models.NewUid()
+		notification.CreatedAt = time.Now().Unix()
+		notification.Recipient = secretSanta.Owner.Email
+
+		err = notificationsCollection.Insert(notification)
+		if err != nil {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+			return
+		}
+
 	}
 
 }
