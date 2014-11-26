@@ -58,16 +58,16 @@ func main() {
 	}
 
 	personResource := &resources.PersonResource{}
-	person := router.Group("/persons/")
-	person.POST("/", personResource.Create)
+	person := router.Group("/persons")
+	person.POST("", personResource.Create)
 	person.GET("/:id", personResource.Get)
-	person.GET("/", personResource.List)
+	person.GET("", personResource.List)
 	// person.PUT("/:uid", personResource.Update)
 	// person.DELETE("/:uid/:disable", personResource.Disable)
 
 	secretSantaResource := resources.SecretSantaResource{}
 	secretSanta := router.Group("/secretsanta")
-	secretSanta.POST("/", secretSantaResource.AssignNames)
+	secretSanta.POST("", secretSantaResource.AssignNames)
 
 	notificationResource := resources.NotificationResource{}
 	notification := router.Group("/notification")
