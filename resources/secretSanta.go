@@ -30,8 +30,6 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	persons := []models.Person{}
 	personCollection := mongoStore.C(personModel.Collection())
 
-	var emptyPerson models.Person
-
 	err = personCollection.EnsureIndex(personModel.Index())
 
 	if err != nil {
@@ -40,23 +38,12 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	}
 
 	err = personCollection.Find(bson.M{}).Sort("-age").Limit(personModel.Limit()).All(&persons)
-	// log.Printf("List of people: %s", persons)
 
 	// Create names array list with
 	exchangeList := make([]models.NameEntry, 0)
-	for _, person := range persons {
-		// Create new secret santa name for each person
-		secretSantaName := models.NameEntry{}
-		secretSantaName.Name = person.Name
-		secretSantaName.Owner = emptyPerson
-		secretSantaName.AssignedOn = 0
-		exchangeList = append(exchangeList, secretSantaName)
-	}
-
-	log.Printf("Secret Santa List: %s", exchangeList)
 
 	// Assign a name to each person
-	err = runSecretSanta(persons, exchangeList)
+	exchangeList, err = runSecretSanta(persons, exchangeList)
 
 	if err != nil {
 		sendError(&err, messagecode.E_SERVER_ERROR, c)
@@ -89,26 +76,64 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 
 }
 
-func runSecretSanta(persons []models.Person, secretSantaList []models.NameEntry) error {
+func runSecretSanta(persons []models.Person, secretSantaList []models.NameEntry) ([]models.NameEntry, error) {
 	// For every person, assign them a secret santa
 
-	if len(persons) == 0 || len(secretSantaList) == 0 {
-		return errors.New("Arrays cannot be empty")
+	if len(persons) == 0 {
+		return nil, errors.New("I don't any Santa Clauses :(")
 	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	for index, person := range persons {
-		// Loop until unused name is chosen that is not current person
-		var i int
-		for i = randInt(0, len(persons)); (i == index) || (secretSantaList[i].AssignedOn != 0); i = randInt(0, len(persons)) {
-			log.Printf("Re-choosing i: %i - AssignedOn: %i", i, secretSantaList[i].AssignedOn)
+
+	for len(secretSantaList) < len(persons) {
+		bag := make([]models.Person, len(persons))
+		copy(bag, persons)
+		reset := false
+		secretSantaList = secretSantaList[:0]
+		log.Printf("Selecting Names, names selected (should be 0): %v", len(secretSantaList))
+		log.Printf("Bag of names: %v", bag)
+		log.Printf("Persons: %v", persons)
+		for _, person := range persons {
+			log.Printf("%s, it's your turn!", person.Name)
+			// Loop until unused name is chosen that is not current person
+			var i int
+
+			for i = randInt(0, len(bag)); bag[i].Name == person.Name; i = (i + 1) % len(bag) {
+				log.Printf("Chose again %s", person.Name)
+				// log.Printf("current index: %v", i)
+				// log.Printf("(%v == %v)", bag[i].Name, person.Name)
+				// log.Printf("Total Names Chosen: %v", len(secretSantaList))
+				// log.Printf("Name Selected: %s", bag[i].Name)
+				// log.Printf("Chooser: %s", person.Name)
+				// log.Printf("List: %v", secretSantaList)
+				// log.Printf("Bag: %v", bag)
+
+				// Edge case that we are on last name and is same person, restart!
+				if len(secretSantaList) == len(persons)-1 {
+					log.Printf("Last name was equal to selector, restarting Secret santa.")
+					reset = true
+					break
+				}
+			}
+
+			if reset {
+				break
+			}
+
+			// Selected secret santa, update secretSanta list with secret santa
+			log.Printf("Name selected for %s", person.Name)
+			secretSantaName := models.NameEntry{}
+			secretSantaName.Name = bag[i].Name
+			secretSantaName.Owner = person
+			secretSantaName.AssignedOn = time.Now().Unix()
+			secretSantaList = append(secretSantaList, secretSantaName)
+			// log.Printf("List: %v", secretSantaList)
+
+			// remove selected name from bag
+			bag = append(bag[:i], bag[i+1:]...)
 		}
-		// Selected secret santa, update secretSanta list with secret santa
-		log.Printf("Name selected for %s", person.Name)
-		secretSantaList[i].AssignedOn = time.Now().Unix()
-		secretSantaList[i].Owner = person
 	}
-	return nil
+	return secretSantaList, nil
 }
 
 func randInt(min int, max int) int {
