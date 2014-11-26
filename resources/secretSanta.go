@@ -38,20 +38,9 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	}
 
 	err = personCollection.Find(bson.M{}).Sort("-age").Limit(personModel.Limit()).All(&persons)
-	// log.Printf("List of people: %s", persons)
 
 	// Create names array list with
 	exchangeList := make([]models.NameEntry, 0)
-	// for _, person := range persons {
-	// 	// Create new secret santa name for each person
-	// 	secretSantaName := models.NameEntry{}
-	// 	secretSantaName.Name = person.Name
-	// 	secretSantaName.Owner = emptyPerson
-	// 	secretSantaName.AssignedOn = 0
-	// 	exchangeList = append(exchangeList, secretSantaName)
-	// }
-
-	// log.Printf("Secret Santa List: %s", exchangeList)
 
 	// Assign a name to each person
 	exchangeList, err = runSecretSanta(persons, exchangeList)
