@@ -19,6 +19,36 @@ import (
 type SecretSantaResource struct {
 }
 
+func (ss *SecretSantaResource) List(c *gin.Context) {
+	var err error
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	secretSantaModel := &models.SecretSanta{}
+	secretSantaList := []models.SecretSanta{}
+	secretSantaCollection := mongoStore.C(secretSantaModel.Collection())
+
+	err = secretSantaCollection.EnsureIndex(secretSantaModel.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = secretSantaCollection.Find(bson.M{}).Sort("-created_at").All(&secretSantaList)
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			sendError(&err, messagecode.S_RESOURCE_NOTFOUND, c)
+		} else {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+		}
+		return
+	}
+
+	for index, _ := range secretSantaList {
+		secretSantaList[index].List = make([]models.NameEntry, 0)
+	}
+	sendResponse(secretSantaList, messagecode.S_RESOURCE_OK, c)
+	return
+}
+
 func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 	var err error
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
