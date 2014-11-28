@@ -49,13 +49,12 @@ func (n *NotificationResource) Send(c *gin.Context) {
 	}
 
 	err = secretSantaCollection.Find(bson.M{"uid": id}).One(&secretSantaList)
-	log.Printf("List of people: %s", secretSantaList)
+	// log.Printf("List of people: %v", secretSantaList)
 
 	// Create names array list with
 	for _, secretSanta := range secretSantaList.List {
 		// Send out secret santa for each person
 
-		log.Printf("Sending email to: %s with name: %s", secretSanta.Owner.Email, secretSanta.Name)
 		err = sendEmail(secretSanta.Owner.Email, secretSanta.Owner.Name, secretSanta.Name)
 
 		if err != nil {
@@ -79,7 +78,7 @@ func (n *NotificationResource) Send(c *gin.Context) {
 }
 
 func sendEmail(recipientEmail string, recipientName string, name string) error {
-	log.Printf("Sending email to: %s with name: %s", recipientEmail, name)
+	// log.Printf("Sending email to: %v with name: %v", recipientEmail, name)
 	msg := mandrill.NewMessageTo(recipientEmail, recipientName)
 	msg.Text = "Ho Ho Ho, Merry Christmas " + recipientName + "! This year, your secret Santa is: " + name // optional
 	msg.Subject = "2014 Secret Santa"
@@ -87,7 +86,7 @@ func sendEmail(recipientEmail string, recipientName string, name string) error {
 	msg.FromName = "JollyHelper"
 	res, err := msg.Send(false)
 
-	log.Printf("Send email, response from Mandril: %s", res)
+	log.Printf("Send email, response from Mandril: %v", res)
 
 	if err != nil {
 		return err
