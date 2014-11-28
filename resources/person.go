@@ -125,3 +125,74 @@ func (p *PersonResource) List(c *gin.Context) {
 	sendResponse(&persons, messagecode.S_RESOURCE_OK, c)
 	return
 }
+
+func (p *PersonResource) AddListItem(c *gin.Context) {
+	id := c.Params.ByName("id")
+
+	if id == "" {
+		err := errors.New("invalid id")
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+
+	var err error
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+
+	person := &models.Person{}
+	personsCollection := mongoStore.C(person.Collection())
+
+	err = personsCollection.EnsureIndex(person.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = personsCollection.Find(bson.M{"uid": id}).One(person)
+
+	log.Printf("Person %s", person)
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			sendError(&err, messagecode.S_RESOURCE_NOTFOUND, c)
+		} else {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+		}
+		return
+	}
+
+	// Add new list item
+	listItem := &models.ListItem{}
+
+	err = binding.JSON.Bind(c.Request, listItem)
+
+	if err != nil {
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+
+	if listItem.Uid == "" {
+		listItem.Uid = models.NewUid()
+	}
+
+	log.Printf("List received: %v", listItem)
+
+	// person.List = append(person.List, listItem)
+	person.List = append(person.List, *listItem)
+
+	log.Printf("Person to be updated: %v", person)
+
+	query := bson.M{"email": person.Email}
+	person.UpdatedAt = time.Now().Unix()
+	update := bson.M{"$set": models.Struct2Map(person)}
+
+	err = personsCollection.Update(query, update)
+	if err != nil {
+		log.Print("ERROR: %s", err)
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	sendResponse(&person, messagecode.S_RESOURCE_CREATED, c)
+	return
+
+}
