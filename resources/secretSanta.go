@@ -71,7 +71,7 @@ func (ss *SecretSantaResource) AssignNames(c *gin.Context) {
 		return
 	}
 
-	sendResponse(&secretSantaModel, messagecode.S_RESOURCE_OK, c)
+	sendResponse(secretSantaModel.Uid, messagecode.S_RESOURCE_OK, c)
 	return
 
 }
