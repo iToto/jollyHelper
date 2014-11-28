@@ -25,3 +25,24 @@ You can run the application with:
 ```sh
 » foreman start -e .env
 ```
+
+Available Endpoints:
+
+```sh
+  ,--.       ,--.,--.         ,--.  ,--.       ,--.
+  `--' ,---. |  ||  |,--. ,--.|  '--'  | ,---. |  | ,---.  ,---. ,--.--.
+  ,--.| .-. ||  ||  | \  '  / |  .--.  || .-. :|  || .-. || .-. :|  .--'
+  |  |' '-' '|  ||  |  \   '  |  |  |  |\   --.|  || '-' '\   --.|  |
+.-'  / `---' `--'`--'.-'  /   `--'  `--' `----'`--'|  |-'  `----'`--'
+'---'                `---'                         `--'
+
+POST  /persons                  --> PersonResource.Create
+GET   /persons/:id              --> PersonResource.Get
+GET   /persons                  --> PersonResource.List
+POST  /persons/:id/list         --> PersonResource.AddListItem
+POST  /secretsanta              --> SecretSantaResource.AssignNames
+GET   /secretsanta              --> SecretSantaResource.List
+GET   /notification/:id         --> NotificationResource.Send
+GET   /                         --> Hello World
+GET   /ping                     --> pong
+```
