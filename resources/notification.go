@@ -49,7 +49,7 @@ func (n *NotificationResource) Send(c *gin.Context) {
 	}
 
 	err = secretSantaCollection.Find(bson.M{"uid": id}).One(&secretSantaList)
-	log.Printf("List of people: %s", secretSantaList)
+	log.Printf("List of people: %v", secretSantaList)
 
 	// Create names array list with
 	for _, secretSanta := range secretSantaList.List {
