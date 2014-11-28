@@ -69,6 +69,7 @@ func main() {
 	secretSantaResource := resources.SecretSantaResource{}
 	secretSanta := router.Group("/secretsanta")
 	secretSanta.POST("", secretSantaResource.AssignNames)
+	secretSanta.GET("", secretSantaResource.List)
 
 	notificationResource := resources.NotificationResource{}
 	notification := router.Group("/notification")
