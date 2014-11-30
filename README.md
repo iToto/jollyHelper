@@ -3,9 +3,12 @@
 ## Build Status
 
 ### Master
+[![Build Status](https://travis-ci.org/iToto/jollyHelper.svg?branch=master)](https://travis-ci.org/iToto/jollyHelper)
 
 ### Develop
 [![Build Status](https://travis-ci.org/iToto/jollyHelper.svg?branch=develop)](https://travis-ci.org/iToto/jollyHelper)
+
+## Overview
 
 JollyHelper is a Christmas exchange application that takes in dictionary in the format:
 
