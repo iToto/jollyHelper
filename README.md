@@ -40,6 +40,7 @@ POST  /persons                  --> PersonResource.Create
 GET   /persons/:id              --> PersonResource.Get
 GET   /persons                  --> PersonResource.List
 POST  /persons/:id/list         --> PersonResource.AddListItem
+GET   /persons/:id/list         --> PersonResource.GetUserList
 POST  /secretsanta              --> SecretSantaResource.AssignNames
 GET   /secretsanta              --> SecretSantaResource.List
 GET   /notification/:id         --> NotificationResource.Send
