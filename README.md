@@ -1,5 +1,15 @@
 # JollyHelper
 
+## Build Status
+
+### Master
+[![Build Status](https://travis-ci.org/iToto/jollyHelper.svg?branch=master)](https://travis-ci.org/iToto/jollyHelper)
+
+### Develop
+[![Build Status](https://travis-ci.org/iToto/jollyHelper.svg?branch=develop)](https://travis-ci.org/iToto/jollyHelper)
+
+## Overview
+
 JollyHelper is a Christmas exchange application that takes in dictionary in the format:
 
 `Name : email@address.com`
@@ -40,6 +50,7 @@ POST  /persons                  --> PersonResource.Create
 GET   /persons/:id              --> PersonResource.Get
 GET   /persons                  --> PersonResource.List
 POST  /persons/:id/list         --> PersonResource.AddListItem
+GET   /persons/:id/list         --> PersonResource.GetUserList
 POST  /secretsanta              --> SecretSantaResource.AssignNames
 GET   /secretsanta              --> SecretSantaResource.List
 GET   /notification/:id         --> NotificationResource.Send

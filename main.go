@@ -63,6 +63,7 @@ func main() {
 	person.GET("/:id", personResource.Get)
 	person.GET("", personResource.List)
 	person.POST("/:id/list", personResource.AddListItem)
+	person.GET("/:id/list", personResource.GetUserList)
 	// person.PUT("/:uid", personResource.Update)
 	// person.DELETE("/:uid/:disable", personResource.Disable)
 

@@ -126,6 +126,46 @@ func (p *PersonResource) List(c *gin.Context) {
 	return
 }
 
+func (p *PersonResource) GetUserList(c *gin.Context) {
+	id := c.Params.ByName("id")
+
+	if id == "" {
+		err := errors.New("invalid id")
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+
+	log.Printf("Reading Person with UID: %s", id)
+
+	var err error
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+
+	person := &models.Person{}
+	personsCollection := mongoStore.C(person.Collection())
+
+	err = personsCollection.EnsureIndex(person.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = personsCollection.Find(bson.M{"uid": id}).One(person)
+
+	log.Printf("Person %s", person)
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			sendError(&err, messagecode.S_RESOURCE_NOTFOUND, c)
+		} else {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+		}
+		return
+	}
+
+	sendResponse(&person.List, messagecode.S_RESOURCE_OK, c)
+	return
+}
+
 func (p *PersonResource) AddListItem(c *gin.Context) {
 	id := c.Params.ByName("id")
 
