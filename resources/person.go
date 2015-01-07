@@ -12,10 +12,47 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	// "strconv"
+	"strings"
 	"time"
 )
 
 type PersonResource struct {
+}
+
+// Auth Functions
+
+// Get user by email address and compare password.
+// If correct, create a session object and return the token
+func (p *PersonResource) Login(c *gin.Context) {
+	credentials := &models.Login{}
+
+	c.Bind(&credentials)
+
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	person := &models.Person{}
+	personsCollection := mongoStore.C(person.Collection())
+
+	err := personsCollection.EnsureIndex(person.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = personsCollection.Find(bson.M{"email": credentials.Username}).One(person)
+
+	bytePassword := []byte(credentials.Password)
+	salt := person.PasswordSalt()
+	hashedPassword := person.HashPassword(bytePassword, salt)
+
+	log.Printf("Person PW %s", person.Password)
+	log.Printf("Cred PW %s", hashedPassword)
+
+	if strings.EqualFold(hashedPassword, credentials.Password) {
+		log.Printf("Authentication Successful")
+	} else {
+		log.Printf("Authentication Failure")
+	}
+
 }
 
 func (p *PersonResource) Create(c *gin.Context) {
@@ -31,6 +68,10 @@ func (p *PersonResource) Create(c *gin.Context) {
 	if person.Uid == "" {
 		person.Uid = models.NewUid()
 	}
+
+	bytePassword := []byte(person.Password)
+	salt := person.PasswordSalt()
+	person.Password = person.HashPassword(bytePassword, salt)
 
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
 	personsCollection := mongoStore.C(person.Collection())
