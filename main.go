@@ -67,6 +67,10 @@ func main() {
 	// person.PUT("/:uid", personResource.Update)
 	// person.DELETE("/:uid/:disable", personResource.Disable)
 
+	// Auth
+	auth := router.Group("/auth")
+	auth.POST("login", personResource.Login)
+
 	secretSantaResource := resources.SecretSantaResource{}
 	secretSanta := router.Group("/secretsanta")
 	secretSanta.POST("", secretSantaResource.AssignNames)
