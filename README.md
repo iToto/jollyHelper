@@ -28,6 +28,15 @@ Then it will randomly assign each email address a name (that does not belong to 
 
 * Install [Heroku toolbelt](https://toolbelt.heroku.com)
 
+## Deploying
+
+### Staging
+To deploy the `develop` branch to staging:
+
+```
+» git push staging develop:master
+```
+
 ## Run
 
 You can run the application with:
@@ -51,6 +60,7 @@ GET   /persons/:id              --> PersonResource.Get
 GET   /persons                  --> PersonResource.List
 POST  /persons/:id/list         --> PersonResource.AddListItem
 GET   /persons/:id/list         --> PersonResource.GetUserList
+POST  /auth/login               --> PersonResource.Login
 POST  /secretsanta              --> SecretSantaResource.AssignNames
 GET   /secretsanta              --> SecretSantaResource.List
 GET   /notification/:id         --> NotificationResource.Send
