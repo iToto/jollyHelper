@@ -44,10 +44,7 @@ func (p *PersonResource) Login(c *gin.Context) {
 	salt := person.PasswordSalt()
 	hashedPassword := person.HashPassword(bytePassword, salt)
 
-	log.Printf("Person PW %s", person.Password)
-	log.Printf("Cred PW %s", hashedPassword)
-
-	if strings.EqualFold(hashedPassword, credentials.Password) {
+	if strings.EqualFold(hashedPassword, person.Password) {
 		log.Printf("Authentication Successful")
 	} else {
 		log.Printf("Authentication Failure")
