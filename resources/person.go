@@ -12,6 +12,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	// "strconv"
+	"code.google.com/p/go-uuid/uuid"
 	"strings"
 	"time"
 )
@@ -46,6 +47,29 @@ func (p *PersonResource) Login(c *gin.Context) {
 
 	if strings.EqualFold(hashedPassword, person.Password) {
 		log.Printf("Authentication Successful")
+		uuid := uuid.New()
+		log.Printf("token: %s", uuid)
+		person.Token = uuid
+
+		query := bson.M{
+			"email": person.Email,
+		}
+
+		updatedPerson := bson.M{"$set": models.Struct2Map(person)}
+
+		err = personsCollection.Update(query, updatedPerson)
+
+		if err != nil {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+			return
+		}
+		token := &models.Token{}
+		token.Token = uuid
+		token.TTL = 999
+		token.Owner = person.Email
+
+		sendResponse(&token, messagecode.S_RESOURCE_OK, c)
+
 	} else {
 		log.Printf("Authentication Failure")
 	}
