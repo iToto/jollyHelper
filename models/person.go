@@ -25,6 +25,12 @@ type ListItem struct {
 	Description string `bson:"description,omitempty" json:"description,omitempty" binding:"required"`
 }
 
+type Token struct {
+	Token string `bson:"token,omitempty" json:"token" binding:"-"`
+	TTL   int    `bson:"ttl,omitempty" json:"ttl" binding:"-"`
+	Owner string `bson:"owner,omitempty" json:"owner" binding:"-"`
+}
+
 type Login struct {
 	Username string `form:"username" binding:"required"`
 	Password string `form:"password" binding:"required"`
@@ -37,6 +43,7 @@ type Person struct {
 	UpdatedAt int64      `bson:"updated_at,omitempty" json:"updated_at" binding:"-"`
 	Name      string     `bson:"name,omitempty" json:"name,omitempty" binding:"required"`
 	Email     string     `bson:"email,omitempty" json:"email" binding:"required"`
+	Token     string     `bson:"token,omitempty" json:"token" binding:"-"`
 	Password  string     `bson:"password,omitempty" json:"password" binding:"required"`
 	Age       string     `bson:"age,omitempty" json:"age" binding:"required"`
 	List      []ListItem `bson:"list,omitempty" json:"list" binding:"-"`
