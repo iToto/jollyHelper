@@ -12,10 +12,68 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	// "strconv"
+	"code.google.com/p/go-uuid/uuid"
+	"strings"
 	"time"
 )
 
 type PersonResource struct {
+}
+
+// Auth Functions
+
+// Get user by email address and compare password.
+// If correct, create a session object and return the token
+func (p *PersonResource) Login(c *gin.Context) {
+	credentials := &models.Login{}
+
+	c.Bind(&credentials)
+
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	person := &models.Person{}
+	personsCollection := mongoStore.C(person.Collection())
+
+	err := personsCollection.EnsureIndex(person.Index())
+	if err != nil {
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
+		return
+	}
+
+	err = personsCollection.Find(bson.M{"email": credentials.Username}).One(person)
+
+	bytePassword := []byte(credentials.Password)
+	salt := person.PasswordSalt()
+	hashedPassword := person.HashPassword(bytePassword, salt)
+
+	if strings.EqualFold(hashedPassword, person.Password) {
+		log.Printf("Authentication Successful")
+		uuid := uuid.New()
+		log.Printf("token: %s", uuid)
+		person.Token = uuid
+
+		query := bson.M{
+			"email": person.Email,
+		}
+
+		updatedPerson := bson.M{"$set": models.Struct2Map(person)}
+
+		err = personsCollection.Update(query, updatedPerson)
+
+		if err != nil {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+			return
+		}
+		token := &models.Token{}
+		token.Token = uuid
+		token.TTL = 999
+		token.Owner = person.Email
+
+		sendResponse(&token, messagecode.S_RESOURCE_OK, c)
+
+	} else {
+		log.Printf("Authentication Failure")
+	}
+
 }
 
 func (p *PersonResource) Create(c *gin.Context) {
@@ -31,6 +89,10 @@ func (p *PersonResource) Create(c *gin.Context) {
 	if person.Uid == "" {
 		person.Uid = models.NewUid()
 	}
+
+	bytePassword := []byte(person.Password)
+	salt := person.PasswordSalt()
+	person.Password = person.HashPassword(bytePassword, salt)
 
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
 	personsCollection := mongoStore.C(person.Collection())
