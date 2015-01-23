@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/freehaha/token-auth"
+	"github.com/freehaha/token-auth/memory"
 	"github.com/gin-gonic/gin"
 	"github.com/iToto/jollyHelper/common"
 	"github.com/iToto/jollyHelper/resources"
@@ -40,11 +42,24 @@ func init() {
 	}
 }
 
+func tokenMemoryStore(salt string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		memStore := memstore.New(salt)
+		tokenAuth := tauth.NewTokenAuth(nil, nil, memStore, nil)
+
+		c.Set("tokenStore", memStore)
+		c.Set("tokenAuth", tokenAuth)
+	}
+}
+
 func main() {
 	router := gin.Default()
 
 	// Connect to DB
 	router.Use(common.MongoDbHandler(APP_DB_URL, APP_DB_NAME))
+
+	// Setup Token Storage
+	router.Use(tokenMemoryStore("jollyHelper"))
 
 	// Test Mandrill
 	mandrill.Key = APP_MANDRILL_KEY
