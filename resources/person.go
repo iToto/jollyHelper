@@ -2,6 +2,8 @@ package resources
 
 import (
 	"errors"
+	// "github.com/freehaha/token-auth"
+	"github.com/freehaha/token-auth/memory"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	// "github.com/iToto/jollyHelper/common"
@@ -30,6 +32,8 @@ func (p *PersonResource) Login(c *gin.Context) {
 	c.Bind(&credentials)
 
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	tokenStore := c.MustGet("tokenStore").(*memstore.MemoryTokenStore)
+
 	person := &models.Person{}
 	personsCollection := mongoStore.C(person.Collection())
 
@@ -47,6 +51,10 @@ func (p *PersonResource) Login(c *gin.Context) {
 
 	if strings.EqualFold(hashedPassword, person.Password) {
 		log.Printf("Authentication Successful")
+
+		t := tokenStore.NewToken(person.Email)
+		log.Printf("hi %s, your token is %s", person.Email, t)
+
 		uuid := uuid.New()
 		log.Printf("token: %s", uuid)
 		person.Token = uuid
