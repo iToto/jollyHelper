@@ -58,7 +58,13 @@ func main() {
 	}
 
 	personResource := &resources.PersonResource{}
+
+	// Auth
+	auth := router.Group("/auth")
+	auth.POST("login", personResource.Login)
+
 	person := router.Group("/persons")
+	person.Use(personResource.Authenticate())
 	person.POST("", personResource.Create)
 	person.GET("/:id", personResource.Get)
 	person.GET("", personResource.List)
@@ -67,17 +73,15 @@ func main() {
 	// person.PUT("/:uid", personResource.Update)
 	// person.DELETE("/:uid/:disable", personResource.Disable)
 
-	// Auth
-	auth := router.Group("/auth")
-	auth.POST("login", personResource.Login)
-
 	secretSantaResource := resources.SecretSantaResource{}
 	secretSanta := router.Group("/secretsanta")
+	secretSanta.Use(personResource.Authenticate())
 	secretSanta.POST("", secretSantaResource.AssignNames)
 	secretSanta.GET("", secretSantaResource.List)
 
 	notificationResource := resources.NotificationResource{}
 	notification := router.Group("/notification")
+	notification.Use(personResource.Authenticate())
 	notification.GET("/:id", notificationResource.Send)
 
 	router.GET("/", func(c *gin.Context) {

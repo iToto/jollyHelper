@@ -18,7 +18,7 @@ Then it will randomly assign each email address a name (that does not belong to 
 
 ## Setup
 
-* Copy and remane the sample environment file
+* Copy and rename the sample environment file
 
 ```sh
 » cp env.example .env

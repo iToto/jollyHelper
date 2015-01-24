@@ -2,6 +2,8 @@ package resources
 
 import (
 	"errors"
+	// "github.com/freehaha/token-auth"
+	// "github.com/freehaha/token-auth/memory"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	// "github.com/iToto/jollyHelper/common"
@@ -30,6 +32,7 @@ func (p *PersonResource) Login(c *gin.Context) {
 	c.Bind(&credentials)
 
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+
 	person := &models.Person{}
 	personsCollection := mongoStore.C(person.Collection())
 
@@ -47,6 +50,7 @@ func (p *PersonResource) Login(c *gin.Context) {
 
 	if strings.EqualFold(hashedPassword, person.Password) {
 		log.Printf("Authentication Successful")
+
 		uuid := uuid.New()
 		log.Printf("token: %s", uuid)
 		person.Token = uuid
@@ -74,6 +78,33 @@ func (p *PersonResource) Login(c *gin.Context) {
 		log.Printf("Authentication Failure")
 	}
 
+}
+
+func (p *PersonResource) Authenticate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestToken := c.Request.URL.Query().Get("token")
+
+		log.Printf("Validating Request Token: %s", requestToken)
+
+		mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+
+		person := &models.Person{}
+		personsCollection := mongoStore.C(person.Collection())
+
+		err := personsCollection.EnsureIndex(person.Index())
+		if err != nil {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+			return
+		}
+
+		err = personsCollection.Find(bson.M{"token": requestToken}).One(person)
+
+		if err != nil {
+			c.Fail(401, err)
+		}
+		c.Set("token", requestToken)
+
+	}
 }
 
 func (p *PersonResource) Create(c *gin.Context) {
