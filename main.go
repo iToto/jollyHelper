@@ -62,6 +62,7 @@ func main() {
 	// Auth
 	auth := router.Group("/auth")
 	auth.POST("login", personResource.Login)
+	auth.POST("register", personResource.Register)
 
 	person := router.Group("/persons")
 	person.Use(personResource.Authenticate())
