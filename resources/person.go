@@ -107,16 +107,41 @@ func (p *PersonResource) Authenticate() gin.HandlerFunc {
 	}
 }
 
-func (p *PersonResource) Create(c *gin.Context) {
-	person := &models.Person{}
+func getByEmail(c *gin.Context, email string) (found bool, person *models.Person) {
+	var err error
+	foundPerson := &models.Person{}
+	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
+	personsCollection := mongoStore.C(foundPerson.Collection())
 
-	err := binding.JSON.Bind(c.Request, person)
-
+	err = personsCollection.EnsureIndex(foundPerson.Index())
 	if err != nil {
-		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
 		return
 	}
 
+	log.Printf("Verifying if email exists: %s", email)
+	err = personsCollection.Find(bson.M{"email": email}).One(foundPerson)
+	log.Printf("Person found %s", foundPerson)
+	// Person does not exist
+	if foundPerson == nil {
+		log.Printf("Email not in use: %s", email)
+		return false, nil
+	}
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			return false, nil
+		} else {
+			sendError(&err, messagecode.E_SERVER_ERROR, c)
+		}
+		return false, nil
+	}
+
+	log.Printf("Person found %s", foundPerson)
+	return true, foundPerson
+}
+
+func createPerson(c *gin.Context, person *models.Person) error {
 	if person.Uid == "" {
 		person.Uid = models.NewUid()
 	}
@@ -127,10 +152,10 @@ func (p *PersonResource) Create(c *gin.Context) {
 
 	mongoStore := c.MustGet("mongoStore").(*mgo.Database)
 	personsCollection := mongoStore.C(person.Collection())
-	err = personsCollection.EnsureIndex(person.Index())
+	err := personsCollection.EnsureIndex(person.Index())
+
 	if err != nil {
-		sendError(&err, messagecode.E_SERVER_ERROR, c)
-		return
+		return err
 	}
 
 	query := bson.M{"email": person.Email}
@@ -138,10 +163,64 @@ func (p *PersonResource) Create(c *gin.Context) {
 	update := bson.M{"$setOnInsert": models.Struct2Map(person)}
 
 	info, err := personsCollection.Upsert(query, update)
+
 	if err != nil {
 		log.Print("ERROR: %s", info)
+		return err
+	}
+
+	return nil
+}
+
+func (p *PersonResource) Register(c *gin.Context) {
+	person := &models.Person{}
+	err := binding.JSON.Bind(c.Request, person)
+
+	if err != nil {
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+
+	// Ensure user does not already exist
+	emailExists, _ := getByEmail(c, person.Email)
+	if emailExists {
+		// Cannot register, email already taken!
+		err := errors.New("Email invalid, please try again")
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+
+	log.Printf("Proceeding to create user: %s", person)
+
+	// Create the person!
+	err = createPerson(c, person)
+
+	if err != nil {
+		err := errors.New("Could not create person")
 		sendError(&err, messagecode.E_SERVER_ERROR, c)
 		return
+	}
+
+	sendResponse(&person, messagecode.S_RESOURCE_CREATED, c)
+	return
+}
+
+func (p *PersonResource) Create(c *gin.Context) {
+	log.Printf("Call to create a user")
+	person := &models.Person{}
+
+	err := binding.JSON.Bind(c.Request, person)
+
+	if err != nil {
+		log.Printf("Could not bind input")
+		sendError(&err, messagecode.E_INVALID_REQUEST, c)
+		return
+	}
+	err = createPerson(c, person)
+
+	if err != nil {
+		err := errors.New("Could not create person")
+		sendError(&err, messagecode.E_SERVER_ERROR, c)
 	}
 
 	sendResponse(&person, messagecode.S_RESOURCE_CREATED, c)
