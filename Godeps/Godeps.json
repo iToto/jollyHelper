@@ -1,19 +1,30 @@
 {
 	"ImportPath": "github.com/iToto/jollyHelper",
-	"GoVersion": "go1.3.3",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go-uuid/uuid",
 			"Comment": "null-12",
-			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
+			"Rev": "'7dda39b2e7d5e265014674c5af696ba4186679e9'"
 		},
 		{
 			"ImportPath": "code.google.com/p/go.crypto/pbkdf2",
 			"Comment": "null-223",
-			"Rev": "31393df5baea9ed8d6778396e7f3896070ea5c04"
+			"Rev": "'31393df5baea9ed8d6778396e7f3896070ea5c04'"
 		},
 		{
 			"ImportPath": "github.com/gin-gonic/gin",
+			"Comment": "v0.4-8-g3b079bb",
+			"Rev": "3b079bb6f79ae501e73a5401c41b589f6616b61e"
+		},
+		{
+			"ImportPath": "github.com/gin-gonic/gin/binding",
+			"Comment": "v0.4-8-g3b079bb",
+			"Rev": "3b079bb6f79ae501e73a5401c41b589f6616b61e"
+		},
+		{
+			"ImportPath": "github.com/gin-gonic/gin/render",
 			"Comment": "v0.4-8-g3b079bb",
 			"Rev": "3b079bb6f79ae501e73a5401c41b589f6616b61e"
 		},
@@ -38,7 +49,19 @@
 			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
 		},
 		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/sasl",
+			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
+		},
+		{
 			"ImportPath": "laerte.sociablelabs.com/common",
+			"Rev": "398c3d6662d7424234c3bd5c021f07b6ab52c3f0"
+		},
+		{
+			"ImportPath": "laerte.sociablelabs.com/common/messagecode",
 			"Rev": "398c3d6662d7424234c3bd5c021f07b6ab52c3f0"
 		}
 	]

@@ -9,6 +9,7 @@ import (
 
 // MongoDBHandler returns a map of the gin context and the MongoDB instance
 func MongoDbHandler(url string, database string) gin.HandlerFunc {
+	log.Printf("Connecting to URL: %s", url)
 	session, err := mgo.Dial(url)
 	if err != nil {
 		panic(err)
