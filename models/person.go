@@ -43,6 +43,7 @@ type Person struct {
 	UpdatedAt int64      `bson:"updated_at,omitempty" json:"updated_at" binding:"-"`
 	Name      string     `bson:"name,omitempty" json:"name,omitempty" binding:"required"`
 	Email     string     `bson:"email,omitempty" json:"email" binding:"required"`
+	Phone     string     `bson:"phone,omitempty" json:"phone" binding:"required"`
 	Token     string     `bson:"token,omitempty" json:"token" binding:"-"`
 	Password  string     `bson:"password,omitempty" json:"password" binding:"required"`
 	Age       string     `bson:"age,omitempty" json:"age" binding:"required"`
