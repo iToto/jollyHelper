@@ -11,11 +11,13 @@ import (
 )
 
 var (
-	APP_PORT         = os.Getenv("PORT")
-	APP_ENV          = os.Getenv("ENV")
-	APP_DB_URL       = os.Getenv("MONGOLAB_URI")
-	APP_DB_NAME      = os.Getenv("MONGOLAB_NAME")
-	APP_MANDRILL_KEY = os.Getenv("MANDRILL_KEY")
+	APP_PORT           = os.Getenv("PORT")
+	APP_ENV            = os.Getenv("ENV")
+	APP_MANDRILL_KEY   = os.Getenv("MANDRILL_KEY")
+	APP_MONGO_HOSTS    = os.Getenv("MONGO_HOSTS")
+	APP_MONGO_DATABASE = os.Getenv("MONGO_DATABASE")
+	APP_MONGO_USERNAME = os.Getenv("MONGO_USERNAME")
+	APP_MONGO_PASSWORD = os.Getenv("MONGO_PASSWORD")
 )
 
 func init() {
@@ -31,11 +33,13 @@ func init() {
 
 	log.Printf("APP_ENV - %s = %s", "ENV", APP_ENV)
 	log.Printf("APP_PORT  - %s = %s", "PORT", APP_PORT)
-	log.Printf("APP_DB_URL  - %s = %s", "MONGOLAB_URI", APP_DB_URL)
-	log.Printf("APP_DB_NAME  - %s = %s", "MONGOLAB_NAME", APP_DB_NAME)
+	log.Printf("MONGO_HOSTS  - %s", APP_MONGO_HOSTS)
+	log.Printf("MONGO_DATABASE  - %s", APP_MONGO_DATABASE)
+	log.Printf("MONGO_USERNAME  - %s", APP_MONGO_USERNAME)
+	log.Printf("MONGO_PASSWORD  - %s", APP_MONGO_PASSWORD)
 
-	if APP_ENV == "" || APP_PORT == "" || APP_DB_URL == "" || APP_DB_NAME == "" || APP_DB_URL == "" {
-		log.Printf("Missing environment variables: ENV: %s, PORT: %s, MONGOLAB_URI: %s, MONGOLAB_NAME  \n", APP_ENV, APP_PORT, APP_DB_URL, APP_DB_NAME)
+	if APP_ENV == "" || APP_PORT == "" || APP_MONGO_DATABASE == "" || APP_MONGO_HOSTS == "" || APP_MONGO_USERNAME == "" || APP_MONGO_PASSWORD == "" {
+		log.Printf("Missing environment variables: ENV: %s, PORT: %s, MONGOLAB_URI: %s, MONGOLAB_NAME  \n", APP_ENV, APP_PORT, APP_MONGO_HOSTS, APP_MONGO_DATABASE)
 		panic("Killing app due to missing environment variables")
 	}
 }
@@ -44,7 +48,7 @@ func main() {
 	router := gin.Default()
 
 	// Connect to DB
-	router.Use(common.MongoDbHandler(APP_DB_URL, APP_DB_NAME))
+	router.Use(common.MongoDbHandler(APP_MONGO_HOSTS, APP_MONGO_DATABASE, APP_MONGO_USERNAME, APP_MONGO_PASSWORD))
 
 	// Test Mandrill
 	mandrill.Key = APP_MANDRILL_KEY
