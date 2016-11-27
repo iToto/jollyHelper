@@ -2,9 +2,6 @@
 	"ImportPath": "github.com/iToto/jollyHelper",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v74",
-	"Packages": [
-		"./..."
-	],
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go-uuid/uuid",
