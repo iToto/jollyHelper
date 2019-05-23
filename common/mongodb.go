@@ -9,23 +9,24 @@ import (
 )
 
 // MongoDBHandler returns a map of the gin context and the MongoDB instance
-func MongoDbHandler(hosts, database, username, password string) gin.HandlerFunc {
-	connInfo := &mgo.DialInfo{
-		Addrs:    []string{hosts},
-		Direct:   true,
-		Timeout:  60 * time.Second,
-		Database: database,
-		Source:   database,
-		Username: username,
-		Password: password,
+func MongoDbHandler(mongoUrl string) gin.HandlerFunc {
+	dialInfo, err := mgo.ParseURL(mongoUrl)
+	if err != nil {
+		log.Fatalf("Could not parse conn url: %s\n", mongoUrl)
 	}
 
-	log.Printf("Host:%s, DB:%s, Username:%s, PW:%s", hosts, database, username, password)
-	log.Printf("Connecting with info: %v", connInfo)
-	session, err := mgo.DialWithInfo(connInfo)
+	log.Printf("Creating Session: %v", connInfo)
+	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		log.Fatalf("CreateSession: %s\n", err)
 	}
+
+	// log.Printf("Authenticating Session: %v", dbCreds)
+	// err = session.Login(dbCreds)
+	// if err != nil {
+	// 	log.Fatalf("Could not authenticate: %s\n", err)
+	// }
+
 	log.Print("Successfully connected to Mongo")
 	return func(c *gin.Context) {
 		c.Set("mongoSession", session)

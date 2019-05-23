@@ -18,6 +18,7 @@ var (
 	APP_MONGO_DATABASE = os.Getenv("MONGO_DATABASE")
 	APP_MONGO_USERNAME = os.Getenv("MONGO_USERNAME")
 	APP_MONGO_PASSWORD = os.Getenv("MONGO_PASSWORD")
+	APP_MONGO_URI      = os.Getenv("MONGOLAB_URI")
 )
 
 func init() {
@@ -48,7 +49,7 @@ func main() {
 	router := gin.Default()
 
 	// Connect to DB
-	router.Use(common.MongoDbHandler(APP_MONGO_HOSTS, APP_MONGO_DATABASE, APP_MONGO_USERNAME, APP_MONGO_PASSWORD))
+	router.Use(common.MongoDbHandler(APP_MONGO_URI))
 
 	// Test Mandrill
 	mandrill.Key = APP_MANDRILL_KEY
